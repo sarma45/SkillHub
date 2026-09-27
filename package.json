@@ -1,0 +1,30 @@
+{
+  "name": "ai-engineering-cockpit",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Human-centered AI engineering cockpit: repo understanding, plan approval, isolated execution, evidence-backed review. MVP per docs/mvp.",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build --workspace @cockpit/web",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "node scripts/typecheck.mjs",
+    "db:migrate": "node --import tsx packages/db/src/cli.ts migrate",
+    "db:seed": "node --import tsx packages/db/src/cli.ts seed"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

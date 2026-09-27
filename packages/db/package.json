@@ -1,0 +1,19 @@
+{
+  "name": "@cockpit/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./migrate": "./src/migrate.ts",
+    "./seed": "./src/seed.ts",
+    "./cli": "./src/cli.ts"
+  },
+  "dependencies": {
+    "@cockpit/contracts": "*",
+    "better-sqlite3": "^11.8.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12"
+  }
+}

@@ -1,0 +1,13 @@
+id: project-memory
+version: 1.0.0
+name: Project memory
+purpose: Save durable lessons and facts with scope, sensitivity, and a human approval checkpoint before influence.
+allowed_tools: [remember]
+forbidden_actions: [writing restricted-scope memories without consent, storing secrets]
+risk_level: low
+human_checkpoints: [approval of agent-written memories in the Memory page]
+stop_conditions:
+  - content rejected by redaction policy
+  - sensitivity label missing for restricted scope
+evaluation_fixtures: [services/memory-service/test/memory.test.ts]
+status: approved

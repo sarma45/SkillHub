@@ -1,0 +1,17 @@
+{
+  "name": "@cockpit/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./badges": "./src/badges.tsx",
+    "./components": "./src/components.tsx"
+  },
+  "dependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  }
+}

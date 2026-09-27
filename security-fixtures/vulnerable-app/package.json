@@ -1,0 +1,10 @@
+{
+  "name": "vulnerable-app-fixture",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Intentionally vulnerable LOCAL safe-lab target for security-scan fixtures. Never deploy.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

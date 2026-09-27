@@ -1,0 +1,12 @@
+id: safe-code-edit
+version: 1.0.0
+name: Safe code edit
+purpose: Apply approved plan changes in an isolated workspace, run checks, and produce a diff.
+allowed_tools: [read_file, search, list_tree, edit_file, run_tests, compute_diff]
+forbidden_actions: [external_submit, editing outside plan.affected_files]
+risk_level: medium
+human_checkpoints: [review before integration]
+stop_conditions:
+  - budget exhausted
+  - out-of-scope file edit requested
+status: approved

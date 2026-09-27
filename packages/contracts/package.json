@@ -1,0 +1,20 @@
+{
+  "name": "@cockpit/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./envelope": "./src/envelope.ts",
+    "./common": "./src/common.ts",
+    "./task": "./src/task.ts",
+    "./plan": "./src/plan.ts",
+    "./run": "./src/run.ts",
+    "./tool": "./src/tool.ts",
+    "./event": "./src/event.ts",
+    "./project": "./src/project.ts"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  }
+}

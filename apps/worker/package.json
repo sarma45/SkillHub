@@ -1,0 +1,22 @@
+{
+  "name": "@cockpit/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./main": "./src/main.ts"
+  },
+  "dependencies": {
+    "@cockpit/contracts": "*",
+    "@cockpit/policy": "*",
+    "@cockpit/db": "*",
+    "@cockpit/repo-parser": "*",
+    "@cockpit/planning-service": "*",
+    "@cockpit/execution-engine": "*",
+    "@cockpit/security-service": "*",
+    "@cockpit/memory-service": "*",
+    "@cockpit/context-service": "*",
+    "@cockpit/evaluation-service": "*",
+    "@cockpit/model-gateway": "*"
+  }
+}

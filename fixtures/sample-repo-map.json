@@ -1,0 +1,56 @@
+{
+  "languages": ["TypeScript", "CSS"],
+  "framework": "Next.js",
+  "package_manager": "npm",
+  "entry_points": ["app/page.tsx"],
+  "build_command": "npm run build",
+  "test_command": "npm test",
+  "tree": {
+    "name": "sample-app",
+    "path": "",
+    "type": "dir",
+    "children": [
+      {
+        "name": "app",
+        "path": "app",
+        "type": "dir",
+        "children": [
+          { "name": "page.tsx", "path": "app/page.tsx", "type": "file" },
+          { "name": "layout.tsx", "path": "app/layout.tsx", "type": "file" },
+          { "name": "globals.css", "path": "app/globals.css", "type": "file" }
+        ]
+      },
+      {
+        "name": "lib",
+        "path": "lib",
+        "type": "dir",
+        "children": [{ "name": "greet.ts", "path": "lib/greet.ts", "type": "file" }]
+      },
+      {
+        "name": "tests",
+        "path": "tests",
+        "type": "dir",
+        "children": [{ "name": "greet.test.ts", "path": "tests/greet.test.ts", "type": "file" }]
+      },
+      { "name": "package.json", "path": "package.json", "type": "file" },
+      { "name": "tsconfig.json", "path": "tsconfig.json", "type": "file" },
+      { "name": "README.md", "path": "README.md", "type": "file" }
+    ]
+  },
+  "directories": [
+    { "path": "app", "file_count": 3, "languages": ["TypeScript"], "purpose": "Application routes/pages", "label": "inferred" },
+    { "path": "lib", "file_count": 1, "languages": ["TypeScript"], "purpose": "Source files", "label": "inferred" },
+    { "path": "tests", "file_count": 1, "languages": ["TypeScript"], "purpose": "Tests", "label": "inferred" }
+  ],
+  "facts": [
+    { "key": "languages", "value": "TypeScript, CSS", "label": "verified", "source_refs": ["file extensions"] },
+    { "key": "framework", "value": "Next.js", "label": "inferred", "source_refs": ["package.json dependencies"] },
+    { "key": "package_manager", "value": "npm", "label": "verified", "source_refs": ["package-lock.json"] },
+    { "key": "test_command", "value": "npm test", "label": "verified", "source_refs": ["package.json scripts.test"] },
+    { "key": "build_command", "value": "npm run build", "label": "verified", "source_refs": ["package.json scripts.build"] },
+    { "key": "entry_points", "value": "app/page.tsx", "label": "inferred", "source_refs": ["conventional entry files"] }
+  ],
+  "unresolved_questions": [],
+  "map_version": 1,
+  "generated_at": "2026-09-26T00:00:00.000Z"
+}

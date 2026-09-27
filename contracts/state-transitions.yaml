@@ -1,0 +1,156 @@
+# State transitions — MVP subset (source of truth)
+
+# This file is the authority for task lifecycle transitions (master prompt §5,
+# TRD §5.2/5.3). packages/policy loads and enforces it. Every transition
+# records actor, timestamp, aggregate version, evidence, and reason.
+
+version: "1.0.0"
+
+states:
+  - DRAFT
+  - FRAMED
+  - PLANNED
+  - AWAITING_PLAN_APPROVAL
+  - EXECUTING
+  - PAUSED_FOR_HUMAN
+  - VERIFYING
+  - NEEDS_REPAIR
+  - READY_FOR_REVIEW
+  - AWAITING_INTEGRATION_APPROVAL
+  - INTEGRATED
+  - CANCELLED
+  - FAILED
+
+# Transitions the MVP state machine allows. Anything not listed is illegal.
+transitions:
+  - from: DRAFT
+    to: FRAMED
+    actor: user
+    requires_evidence: false
+
+  - from: FRAMED
+    to: PLANNED
+    actor: agent
+    requires_evidence: true   # requires a plan document
+
+  - from: FRAMED
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: PLANNED
+    to: AWAITING_PLAN_APPROVAL
+    actor: agent
+    requires_evidence: true   # requires plan_hash
+
+  - from: AWAITING_PLAN_APPROVAL
+    to: EXECUTING
+    actor: user
+    requires_evidence: true   # requires valid, current plan_hash approval
+    guarded: plan_hash_current
+
+  - from: AWAITING_PLAN_APPROVAL
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: EXECUTING
+    to: PAUSED_FOR_HUMAN
+    actor: [user, agent]
+    requires_evidence: false
+
+  - from: EXECUTING
+    to: VERIFYING
+    actor: agent
+    requires_evidence: true   # all plan steps attempted
+
+  - from: EXECUTING
+    to: FAILED
+    actor: [agent, system]
+    requires_evidence: true
+    guarded: budget_exhausted_or_fatal
+
+  - from: EXECUTING
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: PAUSED_FOR_HUMAN
+    to: EXECUTING
+    actor: user
+    requires_evidence: false
+
+  - from: PAUSED_FOR_HUMAN
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: VERIFYING
+    to: READY_FOR_REVIEW
+    actor: evaluator
+    requires_evidence: true   # evidence receipts present; blocking findings gate below
+    guarded: evidence_complete
+
+  - from: VERIFYING
+    to: NEEDS_REPAIR
+    actor: evaluator
+    requires_evidence: true   # failed checks with bounded repair budget remaining
+
+  - from: VERIFYING
+    to: FAILED
+    actor: [evaluator, system]
+    requires_evidence: true
+
+  - from: VERIFYING
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: NEEDS_REPAIR
+    to: VERIFYING
+    actor: agent
+    requires_evidence: true
+    guarded: repair_budget_remaining
+
+  - from: NEEDS_REPAIR
+    to: FAILED
+    actor: [agent, system]
+    requires_evidence: true
+
+  - from: NEEDS_REPAIR
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: READY_FOR_REVIEW
+    to: AWAITING_INTEGRATION_APPROVAL
+    actor: user
+    requires_evidence: true   # evidence packet complete
+
+  - from: READY_FOR_REVIEW
+    to: EXECUTING          # user requested changes -> new run
+    actor: user
+    requires_evidence: false
+
+  - from: READY_FOR_REVIEW
+    to: CANCELLED
+    actor: user
+    requires_evidence: false
+
+  - from: AWAITING_INTEGRATION_APPROVAL
+    to: INTEGRATED
+    actor: user
+    requires_evidence: true
+    guarded: blocking_findings_resolved
+
+  - from: AWAITING_INTEGRATION_APPROVAL
+    to: READY_FOR_REVIEW   # reviewer rejected the draft
+    actor: user
+    requires_evidence: false
+
+# Task-level: no task may jump from DRAFT to any post-execution state
+# (master prompt: "No agent may jump from DRAFT to INTEGRATED").
+invariants:
+  - no_direct_draft_integration
+  - every_transition_records_actor_version_evidence
+  - cancellation_preserves_run_record

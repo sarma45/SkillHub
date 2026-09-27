@@ -1,0 +1,11 @@
+id: plan-generation
+version: 1.0.0
+name: Plan generation
+purpose: Produce an editable, dependency-aware plan with verification steps and checkpoints.
+allowed_tools: [read_file, search]
+forbidden_actions: [write_workspace, external_submit]
+risk_level: low
+human_checkpoints: [plan approval]
+stop_conditions:
+  - brief underspecified beyond two clarification rounds
+status: approved

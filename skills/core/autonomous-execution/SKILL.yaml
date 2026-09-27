@@ -1,0 +1,17 @@
+id: autonomous-execution
+version: 1.0.0
+name: Autonomous execution loop
+purpose: Execute an approved plan with a model-driven tool-use loop behind deterministic policy gates.
+allowed_tools: [read_file, search, list_tree, edit_file, run_tests, compute_diff, remember, browser_verify]
+forbidden_actions: [external_submit, editing outside plan.affected_files, bypassing scope checks]
+risk_level: medium
+human_checkpoints: [plan approval before any run, review before integration]
+stop_conditions:
+  - final summary produced by the model
+  - tool-call budget exhausted
+  - turn budget exhausted
+  - deadline exceeded
+  - user cancellation
+  - mandatory post-loop test run fails
+evaluation_fixtures: [fixtures/sample-app]
+status: approved

@@ -1,0 +1,12 @@
+id: repo-exploration
+version: 1.0.0
+name: Repository exploration
+purpose: Build a repository map and identify relevant files without editing anything.
+allowed_tools: [read_file, search, list_tree]
+forbidden_actions: [write_workspace, external_submit]
+risk_level: low
+human_checkpoints: [map acceptance]
+stop_conditions:
+  - index budget exceeded
+  - unreadable repository
+status: approved

@@ -1,0 +1,14 @@
+id: browser-verification
+version: 1.0.0
+name: Browser verification
+purpose: Verify generated UI in a real headless browser (CDP) with screenshots, console, and HTTP evidence.
+allowed_tools: [browser_verify]
+forbidden_actions: [non-loopback navigation, destructive interactions, external form submission]
+risk_level: medium
+human_checkpoints: [review of screenshots before integration]
+stop_conditions:
+  - target URL fails loopback allowlist
+  - no local browser binary available
+  - capture exceeds timeout
+evaluation_fixtures: [services/browser-service/test/browser.test.ts]
+status: approved

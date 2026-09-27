@@ -1,0 +1,15 @@
+{
+  "name": "sample-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bounded sample repository used by the AI Engineering Cockpit MVP fixtures.",
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "build": "node -e \"console.log('static fixture: nothing to compile')\""
+  },
+  "devDependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

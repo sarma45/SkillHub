@@ -1,0 +1,15 @@
+{
+  "name": "@cockpit/skill-registry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./catalog": "./src/catalog.ts"
+  },
+  "dependencies": {
+    "@cockpit/contracts": "*",
+    "@cockpit/policy": "*",
+    "yaml": "^2.6.1"
+  }
+}

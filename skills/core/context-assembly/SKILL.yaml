@@ -1,0 +1,13 @@
+id: context-assembly
+version: 1.0.0
+name: Context assembly
+purpose: Build budgeted, provenance-labeled context bundles (project, map, memory, file layers) for planning and execution.
+allowed_tools: [list_tree, read_file, remember]
+forbidden_actions: [reading sensitive paths, exceeding the character budget without truncation notices]
+risk_level: low
+human_checkpoints: []
+stop_conditions:
+  - context budget exhausted (truncated refs are reported)
+  - project map missing
+evaluation_fixtures: [fixtures/sample-repo-map.json]
+status: approved
