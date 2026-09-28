@@ -7,8 +7,9 @@ export function Card({ title, actions, children }: { title?: string; actions?: R
         background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: "var(--radius-md)",
-        padding: "var(--space-4)",
+        padding: "20px",
         marginBottom: "var(--space-4)",
+        boxShadow: "var(--shadow-1)",
       }}
       aria-label={title}
     >
@@ -41,7 +42,7 @@ export function Button({
   value?: string;
 }) {
   const styles: Record<string, React.CSSProperties> = {
-    primary: { background: "var(--accent)", color: "#0b1016", border: "1px solid var(--accent)" },
+    primary: { background: "var(--accent)", color: "#ffffff", border: "1px solid var(--accent)" },
     secondary: { background: "var(--surface-2)", color: "var(--text)", border: "1px solid var(--border)" },
     danger: { background: "transparent", color: "var(--err)", border: "1px solid var(--err)" },
   };
@@ -58,6 +59,7 @@ export function Button({
         padding: "8px 16px",
         fontSize: 14,
         fontWeight: 600,
+        letterSpacing: "-0.01em",
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
       }}
@@ -73,9 +75,10 @@ export function EmptyState({ title, body, action }: { title: string; body: strin
       style={{
         border: "1px dashed var(--border)",
         borderRadius: "var(--radius-md)",
-        padding: "var(--space-6)",
+        padding: "48px 28px",
         textAlign: "center",
         color: "var(--text-dim)",
+        background: "var(--surface)",
       }}
     >
       <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", margin: "0 0 8px" }}>{title}</p>

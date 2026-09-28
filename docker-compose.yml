@@ -1,0 +1,17 @@
+services:
+  cockpit:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # Required: the cockpit refuses to run unauthenticated in a container.
+      COCKPIT_AUTH_PASSWORD: ${COCKPIT_AUTH_PASSWORD:?set COCKPIT_AUTH_PASSWORD (plaintext or scrypt hash via hashPassword)}
+      # Optional provider keys passed through when present.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      STRIX_BIN: ${STRIX_BIN:-}
+      # Pin DB inside the mounted volume (never inside the image layer).
+      COCKPIT_DB_FILE: /app/data/cockpit.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

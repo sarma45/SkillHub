@@ -1,10 +1,12 @@
 import { listAllMemories } from "@/server/app-layer";
 import { Card, Button } from "@cockpit/ui/components";
 import { MemoryManager } from "./memory-manager";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
-export default function MemoryPage() {
+export default async function MemoryPage() {
+  await requirePageSession();
   const memories = listAllMemories() as Array<{
     id: string;
     scope: string;

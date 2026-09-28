@@ -841,6 +841,48 @@ export function listBrowserCaptures(db: DB, runId: string | null): BrowserCaptur
   return rows;
 }
 
+// ---------- auth sessions (audit fix #1) ----------
+
+export interface AuthSessionRow {
+  id: string;
+  token_hash: string;
+  actor_id: string;
+  org_id: string;
+  created_at: string;
+  expires_at: string;
+  revoked_at: string | null;
+}
+
+export function insertAuthSession(db: DB, s: { id: string; token_hash: string; actor_id: string; org_id: string; expires_at: string }): AuthSessionRow {
+  const now = new Date().toISOString();
+  db.prepare(
+    "INSERT INTO auth_sessions (id, token_hash, actor_id, org_id, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)"
+  ).run(s.id, s.token_hash, s.actor_id, s.org_id, now, s.expires_at);
+  return getAuthSession(db, s.id)!;
+}
+
+export function getAuthSession(db: DB, id: string): AuthSessionRow | undefined {
+  return db.prepare("SELECT * FROM auth_sessions WHERE id = ?").get(id) as AuthSessionRow | undefined;
+}
+
+export function getAuthSessionByTokenHash(db: DB, tokenHash: string): AuthSessionRow | undefined {
+  return db.prepare("SELECT * FROM auth_sessions WHERE token_hash = ?").get(tokenHash) as AuthSessionRow | undefined;
+}
+
+export function revokeAuthSession(db: DB, tokenHash: string): boolean {
+  const res = db
+    .prepare("UPDATE auth_sessions SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL")
+    .run(new Date().toISOString(), tokenHash);
+  return res.changes > 0;
+}
+
+export function purgeExpiredAuthSessions(db: DB): number {
+  const res = db
+    .prepare("DELETE FROM auth_sessions WHERE expires_at < ? OR revoked_at IS NOT NULL")
+    .run(new Date().toISOString());
+  return res.changes;
+}
+
 export function updateBrowserCapture(db: DB, id: string, patch: Partial<Pick<BrowserCaptureRow, "status" | "title" | "console_messages_json" | "http_failures_json" | "viewport_json">>): BrowserCaptureRow | undefined {
   const existing = getBrowserCapture(db, id);
   if (!existing) return undefined;

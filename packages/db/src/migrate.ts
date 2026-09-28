@@ -299,6 +299,24 @@ CREATE TABLE IF NOT EXISTS browser_captures (
 );
 `
   },
+  {
+    version: 3,
+    name: "auth-sessions",
+    sql: `
+CREATE TABLE IF NOT EXISTS auth_sessions (
+  id TEXT PRIMARY KEY,
+  token_hash TEXT NOT NULL UNIQUE,
+  actor_id TEXT NOT NULL,
+  org_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  revoked_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_token ON auth_sessions(token_hash);
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_expiry ON auth_sessions(expires_at);
+`
+  },
 ];
 
 export function migrate(db: Database.Database): { applied: number[]; current: number } {

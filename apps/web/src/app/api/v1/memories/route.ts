@@ -3,7 +3,7 @@ import { ZodError } from "zod";
 import { z } from "zod";
 import { createMemory, listAllMemories } from "@/server/app-layer";
 import { HttpError, ok, readJsonBody, requireIdempotencyKey, wrapUnknown, withIdempotency } from "@/server/http";
-import { requestContext } from "@/server/context";
+import { requestContext, type RequestContext } from "@/server/context";
 import { getDb } from "@/server/db";
 
 export const dynamic = "force-dynamic";
@@ -19,23 +19,26 @@ const CreateMemoryRequest = z.object({
 });
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
+    ctx = requestContext(req.headers);
     const { searchParams } = new URL(req.url);
     const items = listAllMemories({
       kind: searchParams.get("kind") ?? undefined,
       scope: searchParams.get("scope") ?? undefined,
       project_id: searchParams.get("project_id") ?? undefined,
     });
-    return ok({ memories: items }, ctx.requestId);
+    return ok({ memories: items }, ctx?.requestId ?? "unauthenticated");
   } catch (err) {
-    return wrapUnknown(err, ctx.requestId);
+    return wrapUnknown(err, ctx?.requestId ?? "unauthenticated");
   }
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
+    ctx = requestContext(req.headers);
+
     const body = await readJsonBody(req);
     const key = requireIdempotencyKey(req);
     const parsed = CreateMemoryRequest.parse(body);
@@ -55,9 +58,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (err instanceof ZodError) {
       return wrapUnknown(
         new HttpError("VALIDATION_FAILED", "invalid memory request", err.issues.map((i) => ({ path: i.path.join("."), message: i.message }))),
-        ctx.requestId
+        ctx?.requestId ?? "unauthenticated"
       );
     }
-    return wrapUnknown(err, ctx.requestId);
+    return wrapUnknown(err, ctx?.requestId ?? "unauthenticated");
   }
 }

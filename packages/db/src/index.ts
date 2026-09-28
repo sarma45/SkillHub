@@ -17,6 +17,11 @@ export function openDb(file: string): Database.Database {
   const db = new Database(file);
   db.pragma("journal_mode = WAL");
   db.pragma("foreign_keys = ON");
+  // Audit fix #3: keep the WAL bounded (OneDrive/backup-friendly) and fail
+  // fast-ish under lock contention instead of throwing SQLITE_BUSY forever.
+  db.pragma("wal_autocheckpoint = 256");
+  db.pragma("busy_timeout = 5000");
+  db.pragma("synchronous = NORMAL");
   migrate(db);
   return db;
 }

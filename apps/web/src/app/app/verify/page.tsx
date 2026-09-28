@@ -2,10 +2,12 @@ import { listAllBrowserCaptures } from "@/server/app-layer";
 import { Card, Button } from "@cockpit/ui/components";
 import { CaptureLauncher } from "./capture-launcher";
 import { DataTable, EmptyState } from "@cockpit/ui/components";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
-export default function VerifyPage() {
+export default async function VerifyPage() {
+  await requirePageSession();
   const captures = listAllBrowserCaptures() as Array<{
     id: string;
     artifact_id: string | null;

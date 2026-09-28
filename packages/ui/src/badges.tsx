@@ -1,21 +1,21 @@
 import React from "react";
 
 const STATUS_COLORS: Record<string, { fg: string; bg: string }> = {
-  passed: { fg: "#3ecf8e", bg: "rgba(62,207,142,.12)" },
-  ready: { fg: "#3ecf8e", bg: "rgba(62,207,142,.12)" },
-  approved: { fg: "#3ecf8e", bg: "rgba(62,207,142,.12)" },
-  failed: { fg: "#ef6a6a", bg: "rgba(239,106,106,.12)" },
-  cancelled: { fg: "#9aa8b5", bg: "rgba(154,168,181,.12)" },
-  needs_repair: { fg: "#e6b455", bg: "rgba(230,180,85,.12)" },
-  warning: { fg: "#e6b455", bg: "rgba(230,180,85,.12)" },
-  indexing: { fg: "#4da3ff", bg: "rgba(77,163,255,.12)" },
-  running: { fg: "#4da3ff", bg: "rgba(77,163,255,.12)" },
-  queued: { fg: "#9aa8b5", bg: "rgba(154,168,181,.12)" },
-  paused: { fg: "#e6b455", bg: "rgba(230,180,85,.12)" },
+  passed: { fg: "#1a7f37", bg: "#eaf6ed" },
+  ready: { fg: "#1a7f37", bg: "#eaf6ed" },
+  approved: { fg: "#1a7f37", bg: "#eaf6ed" },
+  failed: { fg: "#cf222e", bg: "#fff0ef" },
+  cancelled: { fg: "#656d76", bg: "#f0f1f3" },
+  needs_repair: { fg: "#825f00", bg: "#fff5d6" },
+  warning: { fg: "#825f00", bg: "#fff5d6" },
+  indexing: { fg: "#0969da", bg: "#eaf2fd" },
+  running: { fg: "#0969da", bg: "#eaf2fd" },
+  queued: { fg: "#656d76", bg: "#f0f1f3" },
+  paused: { fg: "#825f00", bg: "#fff5d6" },
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const c = STATUS_COLORS[status] ?? { fg: "#9aa8b5", bg: "rgba(154,168,181,.12)" };
+  const c = STATUS_COLORS[status] ?? { fg: "#656d76", bg: "#f0f1f3" };
   return (
     <span
       className="badge"
@@ -36,10 +36,10 @@ export function StatusBadge({ status }: { status: string }) {
 }
 
 const RISK_COLORS: Record<string, string> = {
-  low: "#3ecf8e",
-  medium: "#e6b455",
-  high: "#ef6a6a",
-  critical: "#ef6a6a",
+  low: "#1a7f37",
+  medium: "#825f00",
+  high: "#cf222e",
+  critical: "#cf222e",
 };
 
 export function RiskBadge({ risk }: { risk: string }) {
@@ -69,8 +69,8 @@ export function EnvironmentBadge({ env }: { env: string }) {
     <span
       className="badge"
       style={{
-        color: isLocal ? "#4da3ff" : "#e6b455",
-        border: `1px dashed ${isLocal ? "#4da3ff66" : "#e6b45566"}`,
+        color: isLocal ? "#0969da" : "#825f00",
+        border: `1px dashed ${isLocal ? "#0969da66" : "#825f0066"}`,
         borderRadius: 4,
         padding: "2px 8px",
         fontSize: 12,
@@ -86,7 +86,7 @@ export function EvidenceLabelBadge({ label }: { label: string }) {
   return (
     <span
       style={{
-        color: "#9aa8b5",
+        color: "#656d76",
         border: "1px solid var(--border)",
         borderRadius: 4,
         padding: "1px 8px",

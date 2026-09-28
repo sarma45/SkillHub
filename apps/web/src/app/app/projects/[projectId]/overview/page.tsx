@@ -3,12 +3,14 @@ import { Card, Button, KeyValue, EmptyState, PhaseStepper } from "@cockpit/ui/co
 import { StatusBadge, EnvironmentBadge, RiskBadge } from "@cockpit/ui/badges";
 import Link from "next/link";
 import { NewTaskForm } from "../new-task-form";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
 const PHASES = ["Index", "Understand", "Plan", "Execute", "Verify", "Review"];
 
 export default async function ProjectOverview({ params }: { params: Promise<{ projectId: string }> }) {
+  await requirePageSession();
   const { projectId } = await params;
   const project = getProjectById(projectId);
   const mapData = getRepositoryMap(projectId);

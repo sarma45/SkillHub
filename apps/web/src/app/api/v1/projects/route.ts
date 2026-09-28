@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { createProject, listAllProjects, ensureSeeded } from "@/server/app-layer";
 import { HttpError, ok, readJsonBody, requireIdempotencyKey, wrapUnknown, withIdempotency } from "@/server/http";
-import { requestContext } from "@/server/context";
+import { requestContext, type RequestContext } from "@/server/context";
 import { getDb } from "@/server/db";
 import { CreateProjectRequest } from "@cockpit/contracts";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
+    ctx = requestContext(req.headers);
     ensureSeeded();
     const body = await readJsonBody(req);
     const parsed = CreateProjectRequest.parse(body);
@@ -31,17 +32,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
     return (await outcome).response!;
   } catch (err) {
-    return wrapUnknown(normalize(err), ctx.requestId);
+    return wrapUnknown(normalize(err), ctx?.requestId ?? "unauthenticated");
   }
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
+    ctx = requestContext(req.headers);
+
     ensureSeeded();
-    return ok({ projects: listAllProjects() }, ctx.requestId);
+    return ok({ projects: listAllProjects() }, ctx?.requestId ?? "unauthenticated");
   } catch (err) {
-    return wrapUnknown(normalize(err), ctx.requestId);
+    return wrapUnknown(normalize(err), ctx?.requestId ?? "unauthenticated");
   }
 }
 

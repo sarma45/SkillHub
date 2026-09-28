@@ -47,6 +47,7 @@ import {
   CapabilityDisabledError,
   ROLE_SCOPES,
   planHash as computePlanHash,
+  assertPathAllowed,
   type Role,
   type Scope,
 } from "@cockpit/policy";
@@ -110,7 +111,8 @@ export function createProject(input: z.infer<typeof CreateProjectRequest>): { pr
   if (parsed.source.type === "fixture") {
     sourceRef = parsed.source.fixture_id;
   } else {
-    sourceRef = parsed.source.path;
+    // Audit fix #2: local imports are bounded to the configured allowlist.
+    sourceRef = assertPathAllowed(parsed.source.path);
   }
 
   const row = insertProject(db(), {
@@ -678,7 +680,7 @@ export async function buildContextBundleFor(projectId: string, taskRequest: stri
     throw Object.assign(new Error("project map not ready"), { code: "STATE_CONFLICT" });
   }
   const sourceRoot =
-    project.source_type === "fixture" ? fixturePath(project.source_ref) : path.resolve(project.source_ref);
+    project.source_type === "fixture" ? fixturePath(project.source_ref) : assertPathAllowed(project.source_ref);
   const bundle = await assembleContextBundle({
     organizationId: project.organization_id,
     projectId: project.id,

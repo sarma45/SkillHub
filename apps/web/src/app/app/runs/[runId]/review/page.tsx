@@ -1,12 +1,18 @@
-import { getRunById, getTaskById, getRunDiff, getRunEvidence, getPrDraft } from "@/server/app-layer";
+import { getRunById, getTaskById, getRunDiff, getRunEvidence, getPrDraft, getTaskPlans } from "@/server/app-layer";
+import { scorePlan } from "@/lib/plan-trust";
+import { scoreOutcome } from "@/lib/outcome-trust";
+import { RunTrustSummary } from "./run-trust-summary";
+import type { PlanDocument } from "@cockpit/contracts";
 import { Card, KeyValue, Button, EmptyState } from "@cockpit/ui/components";
 import { StatusBadge, EvidenceLabelBadge, RiskBadge } from "@cockpit/ui/badges";
 import Link from "next/link";
 import { PrDraftPanel } from "./pr-draft-panel";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function RunReviewPage({ params }: { params: Promise<{ runId: string }> }) {
+  await requirePageSession();
   const { runId } = await params;
   const run = getRunById(runId);
   const task = getTaskById(run.task_id);
@@ -19,6 +25,10 @@ export default async function RunReviewPage({ params }: { params: Promise<{ runI
   }>;
   const draft = getPrDraft(runId);
   const blocking = evidence.filter((e) => e.status === "failed" && ["high", "critical"].includes(e.severity));
+  // Trust across the lifecycle: approval-time plan score vs receipt-derived outcome.
+  const planRow = getTaskPlans(task.id);
+  const planTrust = planRow ? scorePlan(JSON.parse(planRow.plan_json) as PlanDocument) : null;
+  const outcome = scoreOutcome(evidence);
 
   return (
     <>
@@ -43,6 +53,8 @@ export default async function RunReviewPage({ params }: { params: Promise<{ runI
           ]}
         />
       </Card>
+
+      <RunTrustSummary planTrust={planTrust} outcome={outcome} />
 
       {run.status !== "ready_for_review" && run.status !== "awaiting_integration_approval" && (
         <EmptyState

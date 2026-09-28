@@ -3,6 +3,7 @@
  * idempotency for mutations, request-size guard. No business logic here.
  */
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import type { ApiError } from "@cockpit/contracts";
 import { ErrorCodes, HTTP_STATUS, envelope, errorEnvelope } from "@cockpit/contracts";
 import { createHash } from "node:crypto";
@@ -52,6 +53,18 @@ export function fail(err: HttpError, requestId: string): NextResponse {
 
 export function wrapUnknown(err: unknown, requestId: string): NextResponse {
   if (err instanceof HttpError) return fail(err, requestId);
+  // Zod schema violations from any route become a consistent 400 with field
+  // errors (routes that want custom messaging can still catch ZodError first).
+  if (err instanceof ZodError) {
+    return fail(
+      new HttpError(
+        "VALIDATION_FAILED",
+        "invalid request body",
+        err.issues.map((i) => ({ path: i.path.join("."), message: i.message }))
+      ),
+      requestId
+    );
+  }
   // Domain errors carry a `code` (e.g. PLAN_HASH_MISMATCH); map them onto the
   // shared HTTP semantics so every route responds 409/404/422 consistently.
   if (err && typeof err === "object" && "code" in err && typeof (err as { code: unknown }).code === "string") {

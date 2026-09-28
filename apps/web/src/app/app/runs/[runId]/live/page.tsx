@@ -4,12 +4,14 @@ import { StatusBadge, RiskBadge } from "@cockpit/ui/badges";
 import Link from "next/link";
 import { RunControls } from "./run-controls";
 import { LiveEvents } from "./live-events";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
 const PHASES = ["Execute", "Verify", "Repair", "Review"];
 
 export default async function RunLivePage({ params }: { params: Promise<{ runId: string }> }) {
+  await requirePageSession();
   const { runId } = await params;
   const run = getRunById(runId);
   const task = getTaskById(run.task_id);

@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSkillExtraction, listSkillCandidates, reviewSkillCandidate } from "@/server/app-layer";
 import { HttpError, ok, readJsonBody, wrapUnknown } from "@/server/http";
-import { requestContext } from "@/server/context";
+import { requestContext, type RequestContext } from "@/server/context";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
-    return ok({ candidates: listSkillCandidates() }, ctx.requestId);
+    ctx = requestContext(req.headers);
+    return ok({ candidates: listSkillCandidates() }, ctx?.requestId ?? "unauthenticated");
   } catch (err) {
-    return wrapUnknown(err, ctx.requestId);
+    return wrapUnknown(err, ctx?.requestId ?? "unauthenticated");
   }
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
+    ctx = requestContext(req.headers);
+
     const body = (await readJsonBody(req)) as {
       action?: string;
       skill_id?: string;
@@ -35,7 +38,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       }
       return ok(
         reviewSkillCandidate(body.skill_id, body.decision as "approve"),
-        ctx.requestId
+        ctx?.requestId ?? "unauthenticated"
       );
     }
 
@@ -51,8 +54,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       throw new HttpError("VALIDATION_FAILED", "source must be {kind:'text',text,title} or {kind:'file'|'directory',path}");
     }
     const result = await createSkillExtraction({ source, category: body.category });
-    return ok(result, ctx.requestId);
+    return ok(result, ctx?.requestId ?? "unauthenticated");
   } catch (err) {
-    return wrapUnknown(err, ctx.requestId);
+    return wrapUnknown(err, ctx?.requestId ?? "unauthenticated");
   }
 }

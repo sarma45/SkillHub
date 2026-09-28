@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "@cockpit/ui/tokens.css";
 import "./shell.css";
+import { PrimaryNav } from "@/components/primary-nav";
 
 export const metadata: Metadata = {
-  title: "AI Engineering Cockpit",
-  description: "Human-centered AI engineering workspace: understand, plan, execute, verify.",
+  title: "SkillHub — AI Engineering Studio",
+  description: "A calmer, more accountable workspace for building with AI agents.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -16,23 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <div className="shell">
-          <nav className="sidenav" aria-label="Primary">
-            <div className="sidenav-brand">
-              <span className="brand-mark" aria-hidden>
-                ◈
-              </span>
-              <span>Cockpit</span>
-            </div>
-            <Link href="/app/projects">Projects</Link>
-            <Link href="/app/memory">Memory</Link>
-            <Link href="/app/verify">Verify</Link>
-            <Link href="/skills">Skills</Link>
-            <Link href="/security">Security</Link>
-            <Link href="/app/settings/permissions">Permissions</Link>
-            <div className="sidenav-foot">
-              <span className="env-pill">env: local</span>
-            </div>
-          </nav>
+          <PrimaryNav />
           <main id="main" className="main">
             {children}
           </main>

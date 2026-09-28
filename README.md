@@ -46,7 +46,7 @@ npm install
 npm run dev          # web+API on :3000, worker polling jobs
 ```
 
-Open http://localhost:3000/app/projects → **Import bundled sample-app**
+Open http://localhost:3000/app/projects (login when auth is enabled) → **Import bundled sample-app**
 → wait for `ready` → **Frame task** → **Generate plan** → **Approve
 plan** → choose **Autonomous** mode → **Start run** → watch the live
 tool loop → **Open review** → create the PR draft.
@@ -60,15 +60,49 @@ context-bundle API.
 | Command | Purpose |
 |---|---|
 | `npm run dev` | Start web/API (:3000) + worker |
-| `npm test` | Full suite (104 tests, 13 files) |
-| `npm run typecheck` | Strict tsc over all 15 workspaces |
+| `npm test` | Full suite (138 tests, 17 files) |
+| `npm run typecheck` | Strict tsc over all 18 tsconfigs |
 | `npm run db:migrate` / `db:seed` | Manage `data/cockpit.db` |
 
 Environment: `COCKPIT_DB_FILE` (default `data/cockpit.db`),
 `COCKPIT_REPO_ROOT` (repo root for fixture/workspace resolution),
 `ANTHROPIC_API_KEY` (optional), `STRIX_BIN` (optional, enables live
 Strix safe-lab scans), `COCKPIT_BROWSER_BIN` (optional browser path;
-auto-detects Edge/Chrome).
+auto-detects Edge/Chrome), `COCKPIT_ALLOWED_ROOTS` (path-separated
+list of importable directories — audit fix: blocks arbitrary-filesystem
+imports), and `COCKPIT_AUTH_PASSWORD` / `COCKPIT_AUTH_SECRET`
+(session pepper; optional).
+
+## Authentication & deploy (audit fixes #1, #4)
+
+The app runs unauthenticated in local dev. Before exposing it to any
+network, set `COCKPIT_AUTH_PASSWORD` (plaintext or — better — a
+scrypt hash):
+
+```bash
+# print a storage-safe hash for COCKPIT_AUTH_PASSWORD
+npx tsx -e "import('./apps/web/src/server/auth').then(m => console.log(m.hashPassword('your-password')))"
+
+# run in production mode (builds if needed, starts web + worker)
+npm start
+
+# or with Docker Compose (requires COCKPIT_AUTH_PASSWORD)
+docker compose up --build
+```
+
+When auth is on, every `/api/v1/*` route returns 401 without a session
+cookie (login via `POST /api/v1/auth/login` or the `/login` page); all
+server-rendered pages redirect to `/login`; sessions are 7-day,
+httpOnly, SameSite=Strict cookies whose DB records store only peppered
+SHA-256 token hashes; login is rate-limited (10 attempts / 15 min).
+
+Deploy artifacts: `Dockerfile` (node:22-slim, VOLUME /app/data),
+`docker-compose.yml`, `scripts/prod.mjs` (used by `npm start`), and
+GitHub Actions CI (`.github/workflows/ci.yml`) running typecheck +
+tests + web build on push/PR. The worker's maintenance interval also
+purges expired sessions and checkpoints the SQLite WAL (keep the DB
+out of OneDrive if you can — `COCKPIT_DB_FILE` accepts any path).
+
 
 ## Layout
 

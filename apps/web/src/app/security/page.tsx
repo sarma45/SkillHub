@@ -1,10 +1,12 @@
 import { ScanLauncher } from "./scan-launcher";
 import { Card } from "@cockpit/ui/components";
 import { strixStatus } from "@cockpit/security-service";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function SecurityPage() {
+  await requirePageSession();
   const strix = await strixStatus();
 
   return (

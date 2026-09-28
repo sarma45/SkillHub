@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { createSecurityScanJob, ensureSeeded } from "@/server/app-layer";
 import { HttpError, ok, readJsonBody, wrapUnknown } from "@/server/http";
-import { requestContext } from "@/server/context";
+import { requestContext, type RequestContext } from "@/server/context";
 import { getDb } from "@/server/db";
 import { z } from "zod";
 
@@ -15,16 +15,17 @@ const ScanRequest = z.object({
 });
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const ctx = requestContext(req.headers);
+  let ctx!: RequestContext;
   try {
+    ctx = requestContext(req.headers);
     ensureSeeded();
     const body = await readJsonBody(req);
     const parsed = ScanRequest.parse(body);
-    return ok({ ...createSecurityScanJob(parsed), status: "queued" }, ctx.requestId, 202);
+    return ok({ ...createSecurityScanJob(parsed), status: "queued" }, ctx?.requestId ?? "unauthenticated", 202);
   } catch (err) {
     if (err instanceof ZodError) {
-      return wrapUnknown(new HttpError("VALIDATION_FAILED", "only the local vulnerable-app fixture may be scanned", err.issues.map((i) => ({ path: i.path.join("."), message: i.message }))), ctx.requestId);
+      return wrapUnknown(new HttpError("VALIDATION_FAILED", "only the local vulnerable-app fixture may be scanned", err.issues.map((i) => ({ path: i.path.join("."), message: i.message }))), ctx?.requestId ?? "unauthenticated");
     }
-    return wrapUnknown(err, ctx.requestId);
+    return wrapUnknown(err, ctx?.requestId ?? "unauthenticated");
   }
 }

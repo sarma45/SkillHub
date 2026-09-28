@@ -41,7 +41,7 @@ export const CAPABILITIES: readonly Capability[] = [
   { capability_id: "decision.jev", status: "dormant", required_phase: 5, required_permissions: [], note: "Jev typed decision layer. Dormant; deterministic policy only." },
   { capability_id: "security.remote_target", status: "dormant", required_phase: 9, required_permissions: ["security:scan"], note: "Scans beyond local fixtures. Dormant; requires scope manifest infra." },
   { capability_id: "skills.marketplace", status: "dormant", required_phase: 9, required_permissions: [], note: "Public skill marketplace. Dormant." },
-  { capability_id: "skills.dynamic_extraction", status: "dormant", required_phase: 9, required_permissions: [], note: "Auto-extract skills from repos. Dormant; catalog is static in MVP." },
+  { capability_id: "skills.dynamic_extraction", status: "enabled", required_phase: 4, required_permissions: [], note: "book-to-skill extraction is active; extracted skills stay candidates until a human approves them." },
   { capability_id: "agents.swarm", status: "dormant", required_phase: 9, required_permissions: [], note: "Multi-agent swarms. Dormant; single-agent loop only." },
   { capability_id: "deploy.autonomous", status: "dormant", required_phase: 9, required_permissions: [], note: "Any deployment execution. Dormant; not built." },
 ];

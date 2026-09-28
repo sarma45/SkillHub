@@ -3,6 +3,7 @@ import { Card, KeyValue, EmptyState } from "@cockpit/ui/components";
 import { EvidenceLabelBadge, StatusBadge } from "@cockpit/ui/badges";
 import { FactEditor } from "./fact-editor";
 import type { RepositoryMap, TreeNode } from "@cockpit/contracts";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
 }
 
 export default async function RepositoryMapPage({ params }: { params: Promise<{ projectId: string }> }) {
+  await requirePageSession();
   const { projectId } = await params;
   const data = getRepositoryMap(projectId) as {
     status: string;

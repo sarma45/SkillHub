@@ -240,7 +240,7 @@ function toolInputFor(
     case "read_file":
       return { path: "package.json" };
     case "search":
-      return { query: stepId === "s1" ? "export function" : "TODO" };
+      return { query: stepId === "s1" ? "export function" : "greet" };
     case "edit_file": {
       // Grounded, bounded change: extend lib/greet.ts + tests in the fixture.
       if (stepId === "s2") {

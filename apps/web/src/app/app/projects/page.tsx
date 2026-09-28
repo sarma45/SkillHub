@@ -1,23 +1,33 @@
 import { listAllProjects, ensureSeeded } from "@/server/app-layer";
-import { Card, EmptyState, Button } from "@cockpit/ui/components";
+import { EmptyState, Button } from "@cockpit/ui/components";
 import { StatusBadge } from "@cockpit/ui/badges";
 import Link from "next/link";
 import { ImportProjectForm } from "./import-form";
+import { requirePageSession } from "@/server/auth";
+import "./projects.css";
 
 export const dynamic = "force-dynamic";
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  await requirePageSession();
   ensureSeeded();
   const projects = listAllProjects();
 
   return (
     <>
-      <header className="topbar">
+      <header className="topbar projects-heading">
         <div>
-          <h1 className="page-title">Projects</h1>
-          <p className="page-sub">Connect a repository read-only to build an editable map.</p>
+          <p className="eyebrow">YOUR WORKSPACE</p>
+          <h1 className="page-title">Good work starts with<br className="desktop-break" /> a clear picture.</h1>
+          <p className="page-sub">Bring a repository into a thoughtful, human-led AI workflow. Your source stays read-only while SkillHub builds a map you can inspect and shape.</p>
         </div>
       </header>
+
+      <section className="trust-strip" aria-label="How SkillHub keeps you in control">
+        <div className="trust-symbol" aria-hidden="true">✓</div>
+        <div><strong>AI can be wrong. Your workflow stays reviewable.</strong><p>Actions are scoped, plans ask for your approval, and changes come with evidence for you to inspect.</p></div>
+        <div className="trust-steps"><span>01&nbsp; Understand</span><span>02&nbsp; Approve</span><span>03&nbsp; Verify</span></div>
+      </section>
 
       <ImportProjectForm />
 
@@ -32,23 +42,19 @@ export default function ProjectsPage() {
           }
         />
       ) : (
-        <Card title="Connected projects">
-          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 12 }}>
+        <section className="projects-section" aria-labelledby="connected-projects-title">
+          <div className="section-heading"><div><p className="eyebrow">READY WHEN YOU ARE</p><h2 id="connected-projects-title">Your projects</h2></div><span className="project-count">{projects.length} connected</span></div>
+          <div className="project-grid">
             {projects.map((p) => (
-              <li key={p.id} className="row spread" style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", padding: 12, background: "var(--surface-2)" }}>
-                <div className="row">
-                  <Link href={`/app/projects/${p.id}/overview`} style={{ fontWeight: 600 }}>
-                    {p.name}
-                  </Link>
-                  <span style={{ color: "var(--text-dim)", fontFamily: "var(--font-mono)", fontSize: 12 }}>
-                    {p.source_type}:{p.source_ref}
-                  </span>
-                </div>
-                <StatusBadge status={p.status} />
-              </li>
+              <Link className="project-card" key={p.id} href={`/app/projects/${p.id}/overview`}>
+                <div className="project-card-top"><span className="project-icon" aria-hidden="true">⌘</span><StatusBadge status={p.status} /></div>
+                <h3>{p.name}</h3>
+                <p className="project-source">{p.source_type} <span aria-hidden="true">·</span> {p.source_ref}</p>
+                <span className="project-open">Open project <span aria-hidden="true">↗</span></span>
+              </Link>
             ))}
-          </ul>
-        </Card>
+          </div>
+        </section>
       )}
     </>
   );

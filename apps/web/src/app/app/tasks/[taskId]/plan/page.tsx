@@ -3,14 +3,18 @@ import { Card, KeyValue, Button, PhaseStepper } from "@cockpit/ui/components";
 import { RiskBadge, StatusBadge, EvidenceLabelBadge } from "@cockpit/ui/badges";
 import Link from "next/link";
 import { PlanActions } from "./plan-actions";
+import { TrustPanel } from "@/components/trust-panel";
+import { scorePlan } from "@/lib/plan-trust";
 import { StartRunForm } from "./start-run-form";
 import type { PlanDocument } from "@cockpit/contracts";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
 const PHASES = ["Framed", "Planned", "Awaiting approval", "Executing", "Verifying", "Review"];
 
 export default async function TaskPlanPage({ params }: { params: Promise<{ taskId: string }> }) {
+  await requirePageSession();
   const { taskId } = await params;
   const task = getTaskById(taskId);
   const brief = JSON.parse(task.brief_json) as { request: string; success_criteria: string[]; non_goals: string[]; risk: string };
@@ -89,6 +93,10 @@ export default async function TaskPlanPage({ params }: { params: Promise<{ taskI
                   ["Budget", `${planDoc.budget.max_tool_calls} tool calls · ${planDoc.budget.max_retries} retries · ${Math.round(planDoc.budget.max_duration_ms / 1000)}s`],
                 ]}
               />
+
+              <div style={{ marginTop: 16 }}>
+                <TrustPanel score={scorePlan(planDoc)} />
+              </div>
 
               <h3 style={{ fontSize: 13, color: "var(--text-dim)", marginTop: 16 }}>Steps</h3>
               <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 10 }}>

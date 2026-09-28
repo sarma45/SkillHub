@@ -28,6 +28,7 @@ import {
   insertArtifact,
   getArtifact,
   expireStaleMemories,
+  purgeExpiredAuthSessions,
   nowIso,
   newEntityId,
 } from "@cockpit/db";
@@ -41,7 +42,7 @@ import { recordLesson } from "@cockpit/memory-service";
 import { evaluateChangedFilesQuality } from "@cockpit/evaluation-service";
 import { createToolUseGateway } from "@cockpit/model-gateway";
 import { ScriptedToolAdapter } from "@cockpit/model-gateway";
-import { ROLE_SCOPES, type Scope } from "@cockpit/policy";
+import { ROLE_SCOPES, assertPathAllowed, type Scope } from "@cockpit/policy";
 import { workspaceBaseDir } from "@cockpit/execution-engine";
 import path from "node:path";
 import { promises as fs } from "node:fs";
@@ -122,7 +123,7 @@ async function handleIndexRepository(projectId: string): Promise<void> {
   const root =
     project.source_type === "fixture"
       ? resolveFixtureRoot(project.source_ref)
-      : path.resolve(project.source_ref);
+      : assertPathAllowed(project.source_ref); // audit fix #2: allowlist enforced here too
 
   try {
     const map = await buildRepositoryMap(root);
@@ -580,8 +581,17 @@ async function handleSecurityScan(payload: Record<string, unknown>): Promise<voi
 
 // ---------- main loop ----------
 
-// periodic memory retention sweep (TTL expiry per master prompt Phase 4)
+// periodic maintenance: memory retention sweep (Phase 4), auth-session
+// purge, and WAL checkpoint so the write-ahead log stays bounded even when
+// the web process holds long-lived readers (audit fix #3).
 setInterval(() => {
+  try {
+    const purged = purgeExpiredAuthSessions(db);
+    if (purged > 0) console.log(`[worker] purged ${purged} expired auth session(s)`);
+    db.pragma("wal_checkpoint(TRUNCATE)");
+  } catch (err) {
+    console.error("[worker] maintenance error:", err instanceof Error ? err.message : err);
+  }
   if (running) enqueueJob(db, { job_type: "memory_maintenance", aggregate_id: "memory-sweep" });
 }, 10 * 60 * 1000);
 

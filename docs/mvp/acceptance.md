@@ -46,6 +46,10 @@ on the build machine (Windows, Node 22.22.0, no API keys).
 | book-to-skill extraction live | live: POST real method doc → candidate (purpose, triggers, 5 workflow steps, category) → review `approve` → status `approved`; secrets redacted, license detected; too-short sources rejected | PASS |
 | Quality evaluators live | live: seo-basics / diagram-coherence / design-coherence over the autonomous run's real workspace (4 files) → 3 evaluators run, 1 honest informational finding; worker records `quality:seo-diagram-design` evidence | PASS |
 | Strix preflight honest | live: `GET /api/v1/security/strix-status` → `ready: false` with exact install checklist (Python, pipx strix-agent, Docker, STRIX_BIN) — no fake scan results | PASS |
+| Password auth enforced end-to-end (audit fix #1) | live prod build with `COCKPIT_AUTH_PASSWORD` set: unauth page → `307 /login`; unauth API → `401` envelope; wrong password → `401`; correct → httpOnly SameSite=Strict 7-day cookie (DB stores peppered SHA-256 token hash only); authed API + page → `200`; 15 unit tests (scrypt round-trip, revoke/expiry/purge, rate limit 10/15min) | PASS |
+| Filesystem allowlist (audit fix #2) | `assertPathAllowed` enforced at project create, context bundles, and worker indexer; UNC shares refused; sibling-prefix paths rejected; `COCKPIT_ALLOWED_ROOTS` override tested; violations map to 422 domain error | PASS |
+| WAL bounded + session hygiene (audit fix #3) | `openDb` pragmas: `wal_autocheckpoint=256`, `busy_timeout=5000`, `synchronous=NORMAL`; worker maintenance purges expired sessions and runs `wal_checkpoint(TRUNCATE)` | PASS |
+| Deploy path (audit fixes #4/#5) | `npm start` (scripts/prod.mjs) verified live with auth on (web :3010 + worker polling); Dockerfile + docker-compose (refuses to start without `COCKPIT_AUTH_PASSWORD`); GitHub Actions CI runs typecheck (18 tsconfigs) + vitest + `next build` | PASS |
 
 ## 3. Live end-to-end proof (running system)
 

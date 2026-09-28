@@ -2,10 +2,12 @@ import { listCapabilities } from "@cockpit/policy";
 import { Card, DataTable } from "@cockpit/ui/components";
 import { StatusBadge } from "@cockpit/ui/badges";
 import { ensureSeeded } from "@/server/app-layer";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
-export default function PermissionsPage() {
+export default async function PermissionsPage() {
+  await requirePageSession();
   ensureSeeded();
   const caps = listCapabilities();
   const enabled = caps.filter((c) => c.status === "enabled");

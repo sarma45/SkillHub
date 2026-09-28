@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "start": "node scripts/prod.mjs",
     "build": "npm run build --workspace @cockpit/web",
     "test": "vitest run",
     "test:watch": "vitest",

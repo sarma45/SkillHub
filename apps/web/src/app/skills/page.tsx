@@ -3,6 +3,7 @@ import { Card, DataTable, KeyValue } from "@cockpit/ui/components";
 import { StatusBadge, EvidenceLabelBadge } from "@cockpit/ui/badges";
 import Link from "next/link";
 import { ExtractionPanel } from "./extraction-panel";
+import { requirePageSession } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,7 @@ export default async function SkillsPage({
 }: {
   searchParams: Promise<{ category?: string; status?: string }>;
 }) {
+  await requirePageSession();
   ensureSeeded();
   const { category, status } = await searchParams;
   const skills = listSkillCatalog() as Array<{
